@@ -1,7 +1,7 @@
 from ddt import ddt, data, unpack
 from unittest import TestCase
 
-from index import get_lists_distance, get_lists_similarity_score
+from index01 import get_lists_distance, get_lists_similarity_score
 
 
 @ddt
