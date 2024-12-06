@@ -1,4 +1,9 @@
 import re
+from typing import Optional
+
+
+class LoopException(Exception):
+    pass
 
 
 class Guard:
@@ -8,12 +13,50 @@ class Guard:
         # caches for drawings
         self.path_positions = []
         self.path_directions = []
+        self.obstacle_placements = []
 
     def get_distinct_positions_count(self, obstacles: dict[int, list[int]], map_size: tuple[int, int]):
         self.path_positions, self.path_directions = self._do_simulation(obstacles, map_size)
         return len(set(self.path_positions))
 
-    def _do_simulation(self, obstacles: dict[int, list[int]], map_size: tuple[int, int]):
+    def get_additional_obstacle_positions_which_makes_guard_looping(
+        self, obstacles: dict[int, list[int]], map_size: tuple[int, int], draw_on_loop: bool = False,
+    ):
+        if not self.path_positions:
+            self.path_positions, self.path_directions = self._do_simulation(obstacles, map_size)
+
+        obstacle_placements = []
+        all_positions_len = len(self.path_positions) - 1
+        for idx, (x, y) in enumerate(self.path_positions[1:]):
+            print(f'({x}, {y}) [{idx + 1} / {all_positions_len}] ...', end='\r')
+            if self._check_loop(obstacles, map_size, x, y, draw_on_loop):
+                obstacle_placements.append((x, y))
+            print(f'({x}, {y}) [{idx + 1} / {all_positions_len}] - DONE')
+
+        self.obstacle_placements = set(obstacle_placements)
+        return len(self.obstacle_placements)
+
+    def _check_loop(
+        self, obstacles: dict[int, list[int]], map_size: tuple[int, int], x: int, y: int, draw_on_loop: bool = False,
+    ):
+        new_obstacles = obstacles.copy()
+        new_obstacles[y] = obstacles[y].copy() + [x]
+        try:
+            self._do_simulation(
+                new_obstacles, map_size, detect_loops=True, draw_on_loop=draw_on_loop, special_draw=[(x, y, 'O')],
+            )
+        except LoopException:
+            return True
+        return False
+
+    def _do_simulation(
+        self,
+        obstacles: dict[int, list[int]],
+        map_size: tuple[int, int],
+        detect_loops=False,
+        draw_on_loop=False,
+        special_draw=None,
+    ):
         x, y = self.init_x, self.init_y
         max_x, max_y = map_size[0] - 1, map_size[1] - 1
         # we start by moving up
@@ -24,6 +67,10 @@ class Guard:
 
         while 0 < x < max_x and 0 < y < max_y:
             x, y, direction = self._simulation_step(x, y, direction, obstacles)
+            if detect_loops:
+                self._raise_on_loop(
+                    x, y, direction, map_size, obstacles, path_positions, path_directions, draw_on_loop, special_draw,
+                )
             path_positions.append((x, y))
             path_directions.append(direction)
 
@@ -47,6 +94,12 @@ class Guard:
         """returns the direction rotated 90 degrees clockwise"""
         x, y = direction
         return (-y, x)
+
+    def _raise_on_loop(self, x, y, direction, map_size, obstacles, path_positions, path_directions, draw, special_draw):
+        if ((x, y), direction) in zip(path_positions, path_directions):
+            if draw:
+                MapDrawer.draw_map(path_positions, path_directions, map_size, obstacles, special_draw)
+            raise LoopException
 
 
 class MapParser:
@@ -72,9 +125,13 @@ class MapParser:
 
 class MapDrawer:
     @staticmethod
-    def draw_map(guard: Guard, map_size: tuple[int, int], obstacles: dict[int, list[int]]):
-        positions = guard.path_positions
-        directions = guard.path_directions
+    def draw_map(
+        positions: list[tuple[int, int]],
+        directions: list[tuple[int, int]],
+        map_size: tuple[int, int],
+        obstacles: dict[int, list[int]],
+        special_items: Optional[list[tuple[int, int, str]]] = None,
+    ):
         map = [[' ' for _ in range(map_size[0])] for _ in range(map_size[1])]
         for y, xs in obstacles.items():
             for x in xs:
@@ -86,7 +143,11 @@ class MapDrawer:
                 else ('+' if map[y][x] == '|' else '-')
             )
 
-        map[guard.init_y][guard.init_x] = '^'
+        map[positions[0][1]][positions[0][0]] = '^'
+
+        if special_items:
+            for x, y, symbol in special_items:
+                map[y][x] = symbol
 
         print(64 * '=')
         print('GUARD PATH:')
@@ -109,11 +170,22 @@ def get_distinct_guard_positions_count(guard: Guard, obstacles: dict[int, list[i
     return guard.get_distinct_positions_count(obstacles, map_size)
 
 
+def get_additional_obstacle_positions_which_makes_guard_looping(
+    guard: Guard, obstacles: dict[int, list[int]], map_size: tuple[int, int], draw_on_loop: bool = False
+):
+    return guard.get_additional_obstacle_positions_which_makes_guard_looping(obstacles, map_size, draw_on_loop)
+
+
 def main(data):
     guard, obstacles, map_size = set_up(data)
     distinct_positions_count = get_distinct_guard_positions_count(guard, obstacles, map_size)
+    MapDrawer.draw_map(guard.path_positions, guard.path_directions, map_size, obstacles)
+    additional_obstacle_positions_which_makes_guard_looping = (
+        get_additional_obstacle_positions_which_makes_guard_looping(guard, obstacles, map_size)
+    )
     print(f'Distinct positions count: {distinct_positions_count}')
-    # MapDrawer.draw_map(guard, map_size, obstacles)
+    print('Additional obstacle positions which makes guard looping: '
+          f'{additional_obstacle_positions_which_makes_guard_looping}')
 
 
 if __name__ == '__main__':
