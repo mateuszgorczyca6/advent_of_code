@@ -9,7 +9,6 @@ class MemoryParser:
     def get_sum_with_disablers(self, memory: str) -> int:
         modified_memory = ''.join(memory.split('\n')) + 'do()'
         filtered_memory = re.sub(r'don\'t\(\).*?do\(\)', 'don\'t()do()', modified_memory)
-        print(filtered_memory)
         return self.get_sum(filtered_memory)
 
     def _parse_memory(self, memory: str) -> list[str]:

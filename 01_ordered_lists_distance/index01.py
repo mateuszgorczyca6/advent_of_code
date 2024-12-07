@@ -16,7 +16,7 @@ def get_lists_similarity_score(list1: list, list2: list) -> int:
 if __name__ == '__main__':
     list1 = []
     list2 = []
-    with open('01_1_ordered_lists_distance/input', 'r') as f:
+    with open('01_ordered_lists_distance/input', 'r') as f:
         for line in f.readlines():
             match = re.match(r'(\d+)\s+(\d+)', line)
             if match:

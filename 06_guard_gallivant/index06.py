@@ -151,10 +151,10 @@ class MapDrawer:
 
         print(64 * '=')
         print('GUARD PATH:')
-        print(f'    {'-' * (map_size[1] + 1)}')
+        print(f'    {"-" * (map_size[1] + 1)}')
         for line_nr, line in enumerate(map):
             print(f'{line_nr:>3} |{"".join(line)}| {line_nr}')
-        print(f'    {'-' * (map_size[1] + 1)}')
+        print(f'    {"-" * (map_size[1] + 1)}')
         print(64 * '=')
 
 
