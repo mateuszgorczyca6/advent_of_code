@@ -40,22 +40,47 @@ class Equation:
         return result == self.value
 
 
-def set_up():
-    pass
+class Equation2(Equation):
+    OPERATORS: list[Operator] = [
+        lambda x, y: x + y,
+        lambda x, y: x * y,
+        lambda x, y: int(f'{x}{y}'),
+    ]
 
 
-def get_total_calibration_result(data: str):
+def set_up(data: str):
     equations = [
         Equation(equation)
         for equation in data.split('\n')
         if equation != ''
     ]
+    return equations
+
+
+def get_total_calibration_result(equations: list[Equation]):
     return sum(equation.value for equation in equations if equation.operators is not None)
 
 
+def get_total_calibration_result_2(data: str, eq_from_part_1: list[Equation]):
+    done_values = [
+        equation.value
+        for equation in eq_from_part_1
+        if equation.operators is not None
+    ]
+    equations = [
+        Equation2(equation)
+        for equation in data.split('\n')
+        if equation != '' and int(equation.split(': ')[0]) not in done_values
+    ]
+    return sum(done_values) + sum(equation.value for equation in equations if equation.operators is not None)
+
+
 def main(data: str):
-    total_calibration_result = get_total_calibration_result(data)
+    eq_from_part_1 = set_up(data)
+    total_calibration_result = get_total_calibration_result(eq_from_part_1)
+    total_calibration_result_2 = get_total_calibration_result_2(data, eq_from_part_1)
     print(f'Total calibration result: {total_calibration_result}')
+    print(f'Total calibration result 2: {total_calibration_result_2}')
 
 
 if __name__ == '__main__':

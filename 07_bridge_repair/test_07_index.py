@@ -1,5 +1,5 @@
 from unittest import TestCase
-from index07 import get_total_calibration_result
+from index07 import get_total_calibration_result, get_total_calibration_result_2, set_up
 
 
 INPUT = """190: 10 19
@@ -15,4 +15,9 @@ INPUT = """190: 10 19
 
 class TestBridgeRepair(TestCase):
     def test_get_total_calibration_result(self):
-        self.assertEqual(get_total_calibration_result(INPUT), 3749)
+        eq_from_part_1 = set_up(INPUT)
+        self.assertEqual(get_total_calibration_result(eq_from_part_1), 3749)
+
+    def test_get_total_calibration_result_2(self):
+        eq_from_part_1 = set_up(INPUT)
+        self.assertEqual(get_total_calibration_result_2(INPUT, eq_from_part_1), 11387)
