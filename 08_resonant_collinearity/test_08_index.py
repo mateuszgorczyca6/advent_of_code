@@ -1,7 +1,7 @@
 from unittest import TestCase
 from ddt import ddt, data, unpack
 
-from index08 import get_unique_locations_with_antinode_count
+from index08 import get_unique_locations_with_antinode_count, get_unique_locations_with_extended_antinode_count, set_up
 
 
 # has 2 antinodes
@@ -44,6 +44,7 @@ INPUT3 = """..........
 
 
 # has 14 antinodes
+# has 34 extended antinodes
 INPUT4 = """............
 ........0...
 .....0......
@@ -67,6 +68,20 @@ INPUT5 = """......
 .a...."""
 
 
+# has 9 extended antinodes
+INPUT6 = """T.........
+...T......
+.T........
+..........
+..........
+..........
+..........
+..........
+..........
+..........
+"""
+
+
 @ddt
 class TestBridgeRepair(TestCase):
     @data(
@@ -78,5 +93,16 @@ class TestBridgeRepair(TestCase):
     )
     @unpack
     def test_get_unique_locations_with_antinode_count(self, input: str, expected: int):
-        result = get_unique_locations_with_antinode_count(input)
+        _, antennas_pairs_by_value = set_up(input)
+        result = get_unique_locations_with_antinode_count(antennas_pairs_by_value)
+        self.assertEqual(result, expected)
+
+    @data(
+        {'input': INPUT4, 'expected': 34},
+        {'input': INPUT6, 'expected': 9},
+    )
+    @unpack
+    def test_get_unique_locations_with_extended_antinode_count(self, input: str, expected: int):
+        map, antennas_pairs_by_value = set_up(input)
+        result = get_unique_locations_with_extended_antinode_count(map, antennas_pairs_by_value)
         self.assertEqual(result, expected)
