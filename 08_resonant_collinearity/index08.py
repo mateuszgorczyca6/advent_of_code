@@ -2,7 +2,8 @@ import sys
 
 sys.path.append('.')
 
-from common.grid import Grid, Vector2DPairsValueMapping  # noqa: E402
+from common.grid2d.grid import Grid  # noqa: E402
+from common.grid2d.types import Vector2DPairsValueMapping  # noqa: E402
 
 
 def set_up(data: str):
