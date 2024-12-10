@@ -1,7 +1,7 @@
 from unittest import TestCase
 from ddt import ddt, data, unpack
 
-from index10 import get_sum_of_scores
+from index10 import get_sum_of_ratings, get_sum_of_scores, set_up
 
 
 # score = 1
@@ -42,6 +42,7 @@ INPUT_4 = """10..9..
 """
 
 # score = 36
+# rating = 81
 INPUT_5 = """89010123
 78121874
 87430965
@@ -50,6 +51,35 @@ INPUT_5 = """89010123
 32019012
 01329801
 10456732
+"""
+
+# rating = 3
+INPUT_6 = """.....0.
+..4321.
+..5..2.
+..6543.
+..7..4.
+..8765.
+..9....
+"""
+
+# rating = 13
+INPUT_7 = """..90..9
+...1.98
+...2..7
+6543456
+765.987
+876....
+987...
+"""
+
+# rating = 227
+INPUT_8 = """012345
+123456
+234567
+345678
+4.6789
+56789.
 """
 
 
@@ -64,4 +94,18 @@ class TestIndex10(TestCase):
     )
     @unpack
     def test_get_sum_of_scores(self, input: str, expected: int):
-        self.assertEqual(get_sum_of_scores(input), expected)
+        grid = set_up(input)
+        result = get_sum_of_scores(grid)
+        self.assertEqual(result, expected)
+
+    @data(
+        {'input': INPUT_5, 'expected': 81},
+        {'input': INPUT_6, 'expected': 3},
+        {'input': INPUT_7, 'expected': 13},
+        {'input': INPUT_8, 'expected': 227},
+    )
+    @unpack
+    def test_get_sum_of_ratings(self, input: str, expected: int):
+        grid = set_up(input)
+        result = get_sum_of_ratings(grid)
+        self.assertEqual(result, expected)

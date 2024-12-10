@@ -1,13 +1,19 @@
 import sys
 
+
 sys.path.append('.')
 
 from common.grid2d.cluster_finder import ClusterFinder  # noqa: E402
 from common.grid2d.grid import Grid  # noqa: E402
+from common.grid2d.path_finder import PathFinder  # noqa: E402
 
 
-def get_sum_of_scores(data: str):
+def set_up(data: str):
     grid = Grid(data)
+    return grid
+
+
+def get_sum_of_scores(grid: Grid):
     cluster_finder = ClusterFinder(grid)
     clusters = cluster_finder.find_clusters('0', lambda a, b: int(b)-int(a) == 1)
     sum_of_scores = 0
@@ -18,9 +24,18 @@ def get_sum_of_scores(data: str):
     return sum_of_scores
 
 
+def get_sum_of_ratings(grid: Grid):
+    path_finder = PathFinder(grid)
+    paths = path_finder.find_paths_by_value('0', '9', lambda a, b: int(b)-int(a) == 1)
+    return len(paths)
+
+
 def main(data: str):
-    sum_of_scores = get_sum_of_scores(data)
+    grid = set_up(data)
+    sum_of_scores = get_sum_of_scores(grid)
+    sum_of_ratings = get_sum_of_ratings(grid)
     print(f'Sum of scores: {sum_of_scores}')
+    print(f'Sum of ratings: {sum_of_ratings}')
 
 
 if __name__ == '__main__':
