@@ -1,7 +1,4 @@
 from collections import deque
-import sys
-
-sys.path.append('.')
 
 
 class DataBlock:
@@ -42,18 +39,26 @@ class Disc:
         ])
 
     def print(self, file_per_line: bool = False):
-        repr = ''
+        CHARACTERS = list(map(chr, [
+            *list(range(33, 46)),
+            *list(range(47, 95)),
+            *list(range(47, 126)),
+        ]))
+
+        repr = '\n' * 2 + 64 * '=' + '\n' * 2
         for block in sorted(self.filesystem):
             for _ in range(block.size):
                 if block.is_empty:
                     repr += '.'
                 else:
-                    repr += str(block.value)
-        print(repr)
+                    repr += CHARACTERS[block.value % len(CHARACTERS)]
 
         if file_per_line:
+            repr += '\n'
             for block in sorted(self.filesystem):
-                print(f'{" " * block.idx}{str(block.value) * block.size}')
+                repr += f'{" " * block.idx}{str(block.value) * block.size}\n'
+
+        print(repr)
 
     @classmethod
     def _get_filesystem(cls, data: str, all_size_one: bool):
@@ -121,19 +126,31 @@ class Disc:
 
 class DiscFragmentator:
     @classmethod
-    def fragment_disc(cls, disc: Disc):
-        for file_block in disc.file_blocks:
+    def fragment_disc(cls, disc: Disc, draw: bool = False):
+        if draw:
+            disc.print()
+
+        for no, file_block in enumerate(disc.file_blocks):
             first_fitting_empty_block = cls._get_first_fitting_empty_block(disc, file_block)
             if first_fitting_empty_block is None:
                 continue
 
-            first_fitting_empty_block.insert_file(file_block)
+            new_empty_block = first_fitting_empty_block.insert_file(file_block)
 
             if first_fitting_empty_block.size == 0:
                 cls._remove_obsolete_empty_space(disc, first_fitting_empty_block)
 
+            if draw:
+                disc.filesystem.append(new_empty_block)
+
+                if no % 100 == 0:
+                    disc.print()
+
+        if draw:
+            disc.print()
+
     @classmethod
-    def _get_first_fitting_empty_block(cls, disc, file_block):
+    def _get_first_fitting_empty_block(cls, disc: Disc, file_block: 'DataBlock'):
         return next((
             empty_block
             for empty_block in disc.empty_blocks
@@ -142,7 +159,7 @@ class DiscFragmentator:
         ), None)
 
     @classmethod
-    def _remove_obsolete_empty_space(cls, disc, first_fitting_empty_block):
+    def _remove_obsolete_empty_space(cls, disc: Disc, first_fitting_empty_block: 'DataBlock'):
         disc.empty_blocks.remove(first_fitting_empty_block)
         disc.filesystem.remove(first_fitting_empty_block)
 
@@ -151,14 +168,14 @@ def get_filesystem_checksum(data: str, all_size_one: bool, draw: bool = False):
     data = data.strip()
 
     disc = Disc(data, all_size_one)
-    DiscFragmentator.fragment_disc(disc)
+    DiscFragmentator.fragment_disc(disc, draw)
     return disc.filesystem_checksum
 
 
 def main(data: str):
-    filesystem_checksum = get_filesystem_checksum(data, True)
+    filesystem_checksum = get_filesystem_checksum(data, True, False)
+    filesystem_checksum_2 = get_filesystem_checksum(data, False, True)
     print(f'Filesystem checksum: {filesystem_checksum}')
-    filesystem_checksum_2 = get_filesystem_checksum(data, False)
     print(f'Filesystem checksum 2: {filesystem_checksum_2}')
 
 
