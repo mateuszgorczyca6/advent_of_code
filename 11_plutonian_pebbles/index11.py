@@ -1,3 +1,4 @@
+from functools import cache
 import math
 
 
@@ -11,6 +12,7 @@ class StonesCounter:
             for stone in self.data
         ])
 
+    @cache
     def _get_stone_count(self, stone: int, blinks: int, age: int = 0):
         if age == blinks:
             return 1
@@ -37,9 +39,12 @@ def get_num_of_stones(raw_data: str, blinks: int):
 
 
 def main(data: str):
-    blinks = 25
-    num_of_stones_25 = get_num_of_stones(data, blinks)
-    print(f'Num of stones: {num_of_stones_25}')
+    num_of_stones_25 = get_num_of_stones(data, 25)
+    print(f'Num of stones after 25 blinks: {num_of_stones_25}')
+    num_of_stones_75 = get_num_of_stones(data, 75)
+    print(f'Num of stones after 75 blinks: {num_of_stones_75}')
+    num_of_stones_75 = get_num_of_stones(data, 1000)
+    print(f'Num of stones after 75 blinks: {num_of_stones_75}')
 
 
 if __name__ == '__main__':
