@@ -1,6 +1,6 @@
 import abc
 import sys
-from typing import TYPE_CHECKING, Callable, Iterable
+from typing import TYPE_CHECKING, Callable, Iterable, Optional
 
 sys.path.append('.')
 
@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 
 class AbstractFinder(metaclass=abc.ABCMeta):
     def __init__(self, grid: 'Grid'):
+        """@param unique_vectors: if True, vectors will never be checked twice."""
         self.grid = grid
 
     def _spread_walking(
@@ -26,13 +27,24 @@ class AbstractFinder(metaclass=abc.ABCMeta):
         visited_nodes = {node, *visited_nodes}
         for direction in DIRECTIONS:
             neighbor = self.grid.position_to_vector.get((node.x + direction[0], node.y + direction[1]))
-            if (
-                neighbor
-                and neighbor.is_in_bounds()
-                and neighbor not in visited_nodes
-                and step_condition(node.value, neighbor.value)
-            ):
-                self._action_on_neighbor_node(neighbor, aggregator, step_condition, visited_nodes, *args, **kwargs)
+            if self._should_check(node, neighbor, visited_nodes, step_condition):
+                self._action_on_neighbor_node(
+                    neighbor, aggregator, step_condition, visited_nodes, *args, **kwargs,  # type: ignore
+                )
+
+    def _should_check(
+        self,
+        node: 'Vector2D',
+        neighbor: Optional['Vector2D'],
+        visited_nodes: set['Vector2D'],
+        step_condition: Callable[[str, str], bool],
+    ):
+        return (
+            neighbor
+            and neighbor.is_in_bounds()
+            and neighbor not in visited_nodes
+            and step_condition(node.value, neighbor.value)
+        )
 
     @abc.abstractmethod
     def _action_on_neighbor_node(

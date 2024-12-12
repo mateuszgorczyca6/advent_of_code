@@ -13,6 +13,14 @@ class Vector2D:
         self.value = value
         self.grid = grid
 
+    @property
+    def neighbors(self):
+        DIRECTIONS = [(0, -1), (0, 1), (-1, 0), (1, 0)]
+        return [
+            Vector2D(self.x + dx, self.y + dy, self.value, self.grid)
+            for dx, dy in DIRECTIONS
+        ]
+
     def is_in_bounds(self):
         return 0 <= self.x < self.grid.width and 0 <= self.y < self.grid.height
 

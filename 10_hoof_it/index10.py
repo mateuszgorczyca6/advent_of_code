@@ -15,7 +15,7 @@ def set_up(data: str):
 
 def get_sum_of_scores(grid: Grid):
     cluster_finder = ClusterFinder(grid)
-    clusters = cluster_finder.find_clusters('0', lambda a, b: int(b)-int(a) == 1)
+    clusters = cluster_finder.find_clusters(lambda a, b: int(b)-int(a) == 1, '0')
     sum_of_scores = 0
     for cluster in clusters:
         no_of_1 = [1 for vector in cluster if vector.value == '0']

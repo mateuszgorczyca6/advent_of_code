@@ -43,8 +43,6 @@ def main(data: str):
     print(f'Num of stones after 25 blinks: {num_of_stones_25}')
     num_of_stones_75 = get_num_of_stones(data, 75)
     print(f'Num of stones after 75 blinks: {num_of_stones_75}')
-    num_of_stones_75 = get_num_of_stones(data, 1000)
-    print(f'Num of stones after 75 blinks: {num_of_stones_75}')
 
 
 if __name__ == '__main__':
