@@ -2,6 +2,8 @@ from itertools import chain
 from typing import TYPE_CHECKING, Callable, Optional
 import sys
 
+from common.grid2d.clusters_borders import ClusterBorderFinder
+
 sys.path.append('.')
 
 from common.grid2d.abstract_finder import AbstractFinder  # noqa: E402
@@ -23,6 +25,10 @@ class Cluster(set['Vector2D']):
             for neighbor in vector.neighbors
             if neighbor not in self
         )
+
+    @property
+    def borders(self):
+        return ClusterBorderFinder.get_borders(self)
 
 
 class ClusterFinder(AbstractFinder):

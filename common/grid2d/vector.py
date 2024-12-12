@@ -15,6 +15,7 @@ class Vector2D:
 
     @property
     def neighbors(self):
+        """Return 4 neighbors in order top, bottom, left, right. Diagonals are not included."""
         DIRECTIONS = [(0, -1), (0, 1), (-1, 0), (1, 0)]
         return [
             Vector2D(self.x + dx, self.y + dy, self.value, self.grid)

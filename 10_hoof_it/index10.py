@@ -3,7 +3,7 @@ import sys
 
 sys.path.append('.')
 
-from common.grid2d.cluster_finder import ClusterFinder  # noqa: E402
+from common.grid2d.clusters import ClusterFinder  # noqa: E402
 from common.grid2d.grid import Grid  # noqa: E402
 from common.grid2d.path_finder import PathFinder  # noqa: E402
 
