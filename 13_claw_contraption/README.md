@@ -49,3 +49,90 @@ So, the most prizes you could possibly win is two; the minimum tokens you would 
 You estimate that each button would need to be pressed **no more than 100 times** to win a prize. How else would someone be expected to play?
 
 Figure out how to win as many prizes as possible. **What is the fewest tokens you would have to spend to win all possible prizes?**
+
+## --- Part Two ---
+
+As you go to win the first prize, you discover that the claw is nowhere near where you expected it would be. Due to a unit conversion error in your measurements, the position of every prize is actually `10000000000000` higher on both the `X` and `Y` axis!
+
+Add `10000000000000` to the `X` and `Y` position of every prize. After making this change, the example above would now look like this:
+
+```
+Button A: X+94, Y+34
+Button B: X+22, Y+67
+Prize: X=10000000008400, Y=10000000005400
+
+Button A: X+26, Y+66
+Button B: X+67, Y+21
+Prize: X=10000000012748, Y=10000000012176
+
+Button A: X+17, Y+86
+Button B: X+84, Y+37
+Prize: X=10000000007870, Y=10000000006450
+
+Button A: X+69, Y+23
+Button B: X+27, Y+71
+Prize: X=10000000018641, Y=10000000010279
+```
+
+Now, it is only possible to win a prize on the second and fourth claw machines. Unfortunately, it will take **many more than 100 presses** to do so.
+
+Using the corrected prize coordinates, figure out how to win as many prizes as possible. **What is the fewest tokens you would have to spend to win all possible prizes?**
+
+## --- Part Two Solution ---
+
+We need to find such $a \in \mathbb N$ and $b \in \mathbb N$ which after multiplication with vectors $\vec a = (x_A, y_A)$ and  $\vec b = (x_B, y_B)$ points to $P=(x_P, y_P)$.
+
+Writing it into equation gives
+
+$$
+    a(x_A, y_A) + b(x_B, y_B) = (x_P, y_P).
+$$
+
+Let's divide it into single equation per dimension:
+
+$$
+\left\{
+    \begin{matrix}
+    ax_A+bx_B=x_P,\\
+    ay_A+by_B=y_P.
+    \end{matrix}
+\right.
+$$
+
+Multiply first equation by $y_A$ and second by $x_A$:
+
+$$
+\left\{
+    \begin{matrix}
+    ax_Ay_A+bx_By_A=x_Py_A,\\
+    ax_Ay_A+bx_Ay_B=x_Ay_P.
+    \end{matrix}
+\right.
+$$
+
+Now subtract second equation from first.
+
+$$\sout{ax_Ay_A}+bx_By_A-\sout{ax_Ay_A}-bx_Ay_B=x_Py_A-x_Ay_P$$
+$$bx_By_A-bx_Ay_B=x_Py_A-x_Ay_P$$
+
+Let's solve this equation for $b$.
+
+$$b\left(x_By_A-x_Ay_B\right)=x_Py_A-x_Ay_P.$$ 
+$$b=\frac{x_Py_A-x_Ay_P}{x_By_A-x_Ay_B}.$$
+
+We got solution for $b$. Now using the first equation, let's calculate $a$.
+
+$$ax_A+bx_B=x_P$$
+$$ax_A=x_P-bx_B$$
+$$a=\frac{x_P-bx_B}{x_A}$$
+
+So final solution for the problem is
+
+$$
+\left\{
+    \begin{matrix*}[l]
+    a = \frac{\displaystyle{x_P-bx_B}}{\displaystyle{x_A}}, & a\in\mathbb N; \\[0.5em]
+    b = \frac{\displaystyle{x_Py_A-x_Ay_P}}{\displaystyle{x_By_A-x_Ay_B}}, & b\in\mathbb N.
+    \end{matrix*}
+\right.
+$$
